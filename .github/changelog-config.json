@@ -1,0 +1,17 @@
+{
+  "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n",
+  "categories": [
+    {
+      "title": "🚀 Features",
+      "labels": ["feat"]
+    },
+    {
+      "title": "🐛 Fixes",
+      "labels": ["bug"]
+    },
+    {
+      "title": "🧰 Other",
+      "labels": ["chore", "refactor", "docs"]
+    }
+  ]
+}
