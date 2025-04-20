@@ -23,11 +23,12 @@ public class Util {
 
     public static String getOpenaiBasedResponseContent(HttpResponse<String> response) {
         JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-        return json
+        String content = json
                 .getAsJsonArray("choices")
                 .get(0).getAsJsonObject()
                 .getAsJsonObject("message")
                 .get("content").getAsString();
+        return content.replaceAll("^[\\r\\n]+|[\\r\\n]+$", "");
     }
 
     public static String getCurrentMinecraftTime() {
