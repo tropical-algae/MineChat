@@ -93,4 +93,16 @@ public class Util {
             return null;
         }
     }
+
+    public static Boolean canPlayerTalkToEntity(String playerName) {
+        if (!Config.MOD_ENABLED.get()) {
+            return false;
+        } else {
+            if (Config.USE_WHITE_LIST.get()) {
+                return Config.WHITE_LIST.get().contains(playerName);
+            } else {
+                return !Config.BLACK_LIST.get().contains(playerName);
+            }
+        }
+    }
 }

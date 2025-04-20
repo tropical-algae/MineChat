@@ -6,7 +6,9 @@ import cn.tropicalalgae.minechat.common.model.IChatMessage;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.common.model.impl.TextMessage;
 import cn.tropicalalgae.minechat.utils.Config;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -61,16 +63,21 @@ public class GPTTextTalker implements Runnable {
                     memory.addNewMessage(new TextMessage(this.playerName, this.message, true));
                     String entityReply = runContext(memory);
 
+                    Component replyMsg;
                     if (entityReply != null) {
                         // 更新记忆，广播消息
                         memory.addNewMessage(new TextMessage(memory.getRoleName(), entityReply, false));
+                        replyMsg = Component.literal("<%s>: %s".formatted(memory.getRoleName(), entityReply));
                     } else {
-                        entityReply = "[ERROR] Model inference failed. Please check your config!";
+                        // 播报错误
+                        entityReply = "[ERROR] MineChat inference failed. Please check your config!";
+                        replyMsg = Component.literal(entityReply)
+                                .withStyle(Style.EMPTY.withColor(ChatFormatting.RED));
                         LOGGER.error("Error for model inference, latest message: %s".formatted(this.message));
                     }
-                    Component component = Component.literal("<%s>: %s".formatted(memory.getRoleName(), entityReply));
+
                     for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
-                        player.sendSystemMessage(component);
+                        player.sendSystemMessage(replyMsg);
                     }
                 });
             }

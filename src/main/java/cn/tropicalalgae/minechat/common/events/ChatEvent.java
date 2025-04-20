@@ -29,7 +29,7 @@ public class ChatEvent {
             NetworkHandler.sendToServer(
                     new SendGPTRequestPacket(
                             event.getMessage(),
-                            player.getGameProfile().getName(),
+//                            player.getGameProfile().getName(),
                             targetEntity.getStringUUID()
                     )
             );
