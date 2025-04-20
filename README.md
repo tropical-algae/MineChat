@@ -1,6 +1,6 @@
-<div align="center"><img src="asset/minechat-logo.PNG"/></div>
+<div align="center"><img src="asset/minechat-logo.png"/></div>
 <h3 align="center">A Forge-based mod that integrates GPT into Minecraft</h3>
-<div align="center"><img src="asset/minechat-cover-comp.PNG"/></div>
+<div align="center"><img src="asset/minechat-cover-comp.png"/></div>
 
 ------------------------------
 # Mine Chat
