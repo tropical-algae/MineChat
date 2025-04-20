@@ -80,11 +80,19 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.enabledGameTestNamespaces', mod_id
             args "--username", "Player1"
+            jvmArgs += [
+                    "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
+                    "--add-opens=java.base/java.nio=ALL-UNNAMED"
+            ]
         }
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
 //            args '--nogui'
+            jvmArgs += [
+                    "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
+                    "--add-opens=java.base/java.nio=ALL-UNNAMED"
+            ]
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.

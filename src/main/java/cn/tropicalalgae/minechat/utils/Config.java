@@ -2,6 +2,8 @@ package cn.tropicalalgae.minechat.utils;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.List;
+
 public class Config {
     public static final ForgeConfigSpec COMMON_CONFIG;
     public static final ForgeConfigSpec.ConfigValue<String> GPT_API;
@@ -12,10 +14,16 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> FAMOUS_PROMPT;
     public static final ForgeConfigSpec.ConfigValue<String> ARMORER_PROMPT;
 
+    public static ForgeConfigSpec.BooleanValue MOD_ENABLED;
+    public static ForgeConfigSpec.BooleanValue USE_WHITE_LIST;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> WHITE_LIST;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLACK_LIST;
+
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
+        /* 基础配置 */
         builder.comment("Config for Model").push("model_config");
 
         GPT_API = builder
@@ -36,6 +44,7 @@ public class Config {
 
         builder.pop();
 
+        /* prompt管理 */
         builder.comment("Config for prompt").push("prompt_config");
 
         DEFAULT_PROMPT = builder
@@ -43,12 +52,41 @@ public class Config {
                 .define("default_prompt", "你是Minecraft中的一位村民，你友好且善良");
 
         FAMOUS_PROMPT = builder
-                .comment("Default prompt for villagers of all professions")
+                .comment("Default prompt for villagers of famous")
                 .define("famous_prompt", "");
 
         ARMORER_PROMPT = builder
-                .comment("Default prompt for villagers of all professions")
+                .comment("Default prompt for villagers of armorer")
                 .define("armorer_prompt", "");
+
+        builder.pop();
+
+        /* 权限管理 */
+        builder.comment("Config for player authorization").push("authorization");
+
+        MOD_ENABLED = builder
+                .comment("Allow entities to speak or not. If false, entities will not speak with you by llm")
+                .define("mod_enabled", true);
+
+        USE_WHITE_LIST = builder
+                .comment("Use white list or not. If True, only the players who on the white_list can chat with entities (villager).")
+                .define("use_white_list", false);
+
+        WHITE_LIST = builder
+                .comment("Player white list")
+                .defineListAllowEmpty(
+                        "white_list",
+                        List.of("Steve", "Alex"),
+                        obj -> obj instanceof String
+                );
+
+        BLACK_LIST = builder
+                .comment("Player black list. Specify the list of player names to block from interacting with entities (villagers).")
+                .defineListAllowEmpty(
+                        "black_list",
+                        List.of(),
+                        obj -> obj instanceof String
+                );
 
         builder.pop();
 

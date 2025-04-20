@@ -23,11 +23,12 @@ public class Util {
 
     public static String getOpenaiBasedResponseContent(HttpResponse<String> response) {
         JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-        return json
+        String content = json
                 .getAsJsonArray("choices")
                 .get(0).getAsJsonObject()
                 .getAsJsonObject("message")
                 .get("content").getAsString();
+        return content.replaceAll("^[\\r\\n]+|[\\r\\n]+$", "");
     }
 
     public static String getCurrentMinecraftTime() {
@@ -90,6 +91,18 @@ public class Util {
             return Config.FAMOUS_PROMPT.get();
         } else {
             return null;
+        }
+    }
+
+    public static Boolean canPlayerTalkToEntity(String playerName) {
+        if (!Config.MOD_ENABLED.get()) {
+            return false;
+        } else {
+            if (Config.USE_WHITE_LIST.get()) {
+                return Config.WHITE_LIST.get().contains(playerName);
+            } else {
+                return !Config.BLACK_LIST.get().contains(playerName);
+            }
         }
     }
 }
