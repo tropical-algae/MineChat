@@ -105,4 +105,18 @@ public class Util {
             }
         }
     }
+
+//    private static int calculateCustomOffset(Villager villager, MerchantOffer offer, Player player) {
+//        // 举例：对“图书管理员”村民加价 2
+//        if (villager.getVillagerData().getProfession() == VillagerProfession.LIBRARIAN) {
+//            return +2; // 涨价
+//        }
+//
+//        // 举例：对新玩家全部交易减 1
+//        if (player.getExperienceLevel() < 5) {
+//            return -1; // 打折
+//        }
+//
+//        return 0; // 默认无变化
+//    }
 }

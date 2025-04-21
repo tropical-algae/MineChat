@@ -22,17 +22,20 @@ public class ChatEvent {
     public static void onPlayerChat(ClientChatEvent event){
 
         Player player = Minecraft.getInstance().player;
-        Entity targetEntity = Ways.getPointedEntity(player, 64.0);
 
-        if(isEntitySupportText(targetEntity) && player != null) {
-            LOGGER.info("Prepare a conversation, target UUID: %s".formatted(targetEntity.getStringUUID()));
-            NetworkHandler.sendToServer(
-                    new SendGPTRequestPacket(
-                            event.getMessage(),
-//                            player.getGameProfile().getName(),
-                            targetEntity.getStringUUID()
-                    )
-            );
+        if (player != null) {
+            Entity targetEntity = Ways.getPointedEntity(player, 64.0);
+
+            if(isEntitySupportText(targetEntity)) {
+                LOGGER.info("Prepare a conversation, target UUID: %s".formatted(targetEntity.getStringUUID()));
+                NetworkHandler.sendToServer(
+                        new SendGPTRequestPacket(
+                                event.getMessage(),
+                                targetEntity.getStringUUID()
+                        )
+                );
+            }
         }
+
     }
 }
