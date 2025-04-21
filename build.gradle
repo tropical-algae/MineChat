@@ -82,7 +82,7 @@ minecraft {
             args "--username", "Player1"
             jvmArgs += [
                     "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
-                    "--add-opens=java.base/java.nio=ALL-UNNAMED"
+                    "--add-opens=java.base/java.nio=ALL-UNNAMED",
             ]
         }
 
@@ -91,7 +91,7 @@ minecraft {
 //            args '--nogui'
             jvmArgs += [
                     "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
-                    "--add-opens=java.base/java.nio=ALL-UNNAMED"
+                    "--add-opens=java.base/java.nio=ALL-UNNAMED",
             ]
         }
 

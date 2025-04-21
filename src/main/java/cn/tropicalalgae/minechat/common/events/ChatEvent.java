@@ -27,11 +27,11 @@ public class ChatEvent {
             Entity targetEntity = Ways.getPointedEntity(player, 64.0);
 
             if(isEntitySupportText(targetEntity)) {
-                LOGGER.info("Prepare a conversation, target UUID: %s".formatted(targetEntity.getStringUUID()));
+                LOGGER.info("Prepare a conversation, target UUID: %s".formatted(targetEntity.getUUID().toString()));
                 NetworkHandler.sendToServer(
                         new SendGPTRequestPacket(
                                 event.getMessage(),
-                                targetEntity.getStringUUID()
+                                targetEntity.getUUID().toString()
                         )
                 );
             }

@@ -1,9 +1,13 @@
 package cn.tropicalalgae.minechat.common.model;
 
+import cn.tropicalalgae.minechat.common.model.impl.TextMessage;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
 import java.util.Deque;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface IEntityMemory <T extends IChatMessage> {
     void setRolePrompt(Entity entity);
@@ -14,5 +18,7 @@ public interface IEntityMemory <T extends IChatMessage> {
     Boolean isInitialized();
     String getChatRequestBody();
     void addNewMessage(IChatMessage newMessage);
-    Deque<T> getHistory();
+    List<T> getHistory();
+    Map<UUID, List<T>> getMessageMapSender();
+    Map<UUID, UUID> getMessageReplyMap();
 }

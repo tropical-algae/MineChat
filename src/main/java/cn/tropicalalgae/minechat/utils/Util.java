@@ -16,6 +16,8 @@ import java.util.UUID;
 
 public class Util {
 
+    public static String NULL_MSG_UUID = "NULL_UUID";
+
     public static String sysPromptSuffix = "%s\n重要提示：现在的时间是%s (仅作为一个参考)。" +
             "你的名字叫%s，历史消息中的用户可能来自不同的人，但在最新的消息来自%s";
     public static String entityNamePrompt = "快问快答：请你为%s起一个具体的名字，可以是中文或英文。" +
@@ -51,11 +53,15 @@ public class Util {
     public static Entity findEntityByUUID(MinecraftServer server, String strUUID) {
         UUID uuid = UUID.fromString(strUUID);
         for (ServerLevel level : server.getAllLevels()) {
-            for (Entity entity : level.getAllEntities()) {
-                if (entity.getUUID().equals(uuid)) {
-                    return entity;
-                }
+            Entity entity = level.getEntity(uuid);
+            if (entity != null) {
+                return entity;
             }
+//            for (Entity entity : level.getAllEntities()) {
+//                if (entity.getUUID().equals(uuid)) {
+//                    return entity;
+//                }
+//            }
         }
         return null; // nothing
     }
@@ -95,7 +101,7 @@ public class Util {
     }
 
     public static Boolean canPlayerTalkToEntity(String playerName) {
-        if (!Config.MOD_ENABLED.get()) {
+        if (!Config.MOD_ENABLE.get()) {
             return false;
         } else {
             if (Config.USE_WHITE_LIST.get()) {
