@@ -14,10 +14,14 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> FAMOUS_PROMPT;
     public static final ForgeConfigSpec.ConfigValue<String> ARMORER_PROMPT;
 
-    public static ForgeConfigSpec.BooleanValue MOD_ENABLED;
+    public static ForgeConfigSpec.BooleanValue MOD_ENABLE;
     public static ForgeConfigSpec.BooleanValue USE_WHITE_LIST;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> WHITE_LIST;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLACK_LIST;
+
+    public static ForgeConfigSpec.BooleanValue AFFINITY_ENABLED;
+    public static ForgeConfigSpec.ConfigValue<Integer> AFFINITY_CONTEXT_LENGTH;
+
 
 
     static {
@@ -64,9 +68,9 @@ public class Config {
         /* 权限管理 */
         builder.comment("Config for player authorization").push("authorization");
 
-        MOD_ENABLED = builder
+        MOD_ENABLE = builder
                 .comment("Allow entities to speak or not. If false, entities will not speak with you by llm")
-                .define("mod_enabled", true);
+                .define("mod_enable", true);
 
         USE_WHITE_LIST = builder
                 .comment("Use white list or not. If True, only the players who on the white_list can chat with entities (villager).")
@@ -87,6 +91,18 @@ public class Config {
                         List.of(),
                         obj -> obj instanceof String
                 );
+
+        builder.pop();
+
+        /* 附加功能 好感度-影响交易折扣 */
+        builder.comment("Config for villager affinity").push("affinity_config");
+
+         AFFINITY_ENABLED = builder
+                .comment("Use white list or not. If True, only the players who on the white_list can chat with entities (villager).")
+                .define("affinity_enable", false);
+         AFFINITY_CONTEXT_LENGTH = builder
+                .comment("The required number of conversations triggered by discount detection")
+                .define("affinity_context_length", 10);
 
         builder.pop();
 

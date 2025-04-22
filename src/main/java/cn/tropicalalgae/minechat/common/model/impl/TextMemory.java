@@ -11,17 +11,24 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 
 import javax.annotation.Nullable;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 import static cn.tropicalalgae.minechat.utils.Util.getVillagePrompt;
 import static cn.tropicalalgae.minechat.utils.Util.sysPromptSuffix;
 
 
 public class TextMemory implements IEntityMemory<TextMessage> {
-    private final Deque<TextMessage> history = new LinkedList<>();
+    /* 持久化参数 */
+    private final List<TextMessage> history = new ArrayList<>();
     private String roleName = null;
+
+    /* 动态获取de参数 */
     private String rolePrompt;
+    private final Map<UUID, TextMessage> messageMapID = new HashMap<>();
+    private final Map<UUID, List<TextMessage>> messageMapSender = new HashMap<>();
+    private final Map<UUID, UUID> messageReplyMap = new HashMap<>(); // 消息之间的回复关系 消息：消息的回复
+
+    /* 状态判断参数 */
     private Boolean isInitialized = false;
     private Boolean hasRolePrompt;
 
@@ -47,9 +54,7 @@ public class TextMemory implements IEntityMemory<TextMessage> {
     }
 
     @Override
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
+    public void setRoleName(String roleName) { this.roleName = roleName; }
 
     @Override
     @Nullable
@@ -71,9 +76,9 @@ public class TextMemory implements IEntityMemory<TextMessage> {
         JsonArray messages = new JsonArray();
 
         // 设置系统提示词
-        TextMessage latestMsg = history.getLast();
+        TextMessage latestMsg = this.history.get(this.history.size() - 1);
         String sysPrompt = sysPromptSuffix.formatted(
-                this.rolePrompt, latestMsg.time, this.roleName, latestMsg.role
+                this.rolePrompt, latestMsg.time, this.roleName, latestMsg.senderName
         );
 
         JsonObject sysMsgContent = new JsonObject();
@@ -82,16 +87,28 @@ public class TextMemory implements IEntityMemory<TextMessage> {
         messages.add(sysMsgContent);
 
         // 拼接历史记录
-        for (TextMessage msg : this.history) {
+        int length = history.size();
+        int start = Math.max(0, length - Config.CONTEXT_LENGTH.get());
+        for (int i = start; i < length; i++) {
+            TextMessage msg = history.get(i);
             JsonObject msgContent = new JsonObject();
             msgContent.addProperty("role", msg.fromPlayer ? "user" : "assistant");
-            msgContent.addProperty("content", msg.getMessage());
+            msgContent.addProperty("content", msg.getMessage(false));
             if (msg.fromPlayer) {
-                msgContent.addProperty("name", msg.role);
+                msgContent.addProperty("name", msg.senderName);
             }
             messages.add(msgContent);
         }
 
+//        for (TextMessage msg : this.history) {
+//            JsonObject msgContent = new JsonObject();
+//            msgContent.addProperty("role", msg.fromPlayer ? "user" : "assistant");
+//            msgContent.addProperty("content", msg.getMessage(false));
+//            if (msg.fromPlayer) {
+//                msgContent.addProperty("name", msg.sender_name);
+//            }
+//            messages.add(msgContent);
+//        }
         root.addProperty("model", Config.GPT_MODEL.get());
         root.add("messages", messages);
         return new Gson().toJson(root);
@@ -99,16 +116,30 @@ public class TextMemory implements IEntityMemory<TextMessage> {
 
     @Override
     public void addNewMessage(IChatMessage newMessage) {
-        if (this.history.size() >= Config.CONTEXT_LENGTH.get()) {
-            history.pollFirst();
-        }
-        if (newMessage instanceof TextMessage) {
-            this.history.addLast((TextMessage) newMessage);
+//        if (this.history.size() >= Config.CONTEXT_LENGTH.get()) {
+//            this.history.pollFirst();
+//        }
+        // TODO 添加高性能的历史截断方法
+        if (newMessage instanceof TextMessage textMessage) {
+            if (textMessage.getRepliedUUID() != null) {
+                this.messageReplyMap.put(textMessage.getRepliedUUID(), newMessage.getUUID());
+            }
+            this.history.add(textMessage);
+            this.messageMapID.put(textMessage.getUUID(), textMessage);
+            this.messageMapSender
+                    .computeIfAbsent(textMessage.getSenderUUID(), k -> new ArrayList<>())
+                    .add(textMessage);
         }
     }
 
     @Override
-    public Deque<TextMessage> getHistory() {
-        return history;
+    public List<TextMessage> getHistory() {
+        return this.history;
     }
+
+    @Override
+    public Map<UUID, List<TextMessage>> getMessageMapSender() { return this.messageMapSender; }
+
+    @Override
+    public Map<UUID, UUID> getMessageReplyMap() {return this.messageReplyMap; }
 }

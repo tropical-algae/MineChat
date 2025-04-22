@@ -10,6 +10,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.UUID;
 
 public class TextMemoryProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
