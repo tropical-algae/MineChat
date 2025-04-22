@@ -52,7 +52,7 @@ public class TextMessage implements IChatMessage {
 
     @Override
     public String getMessage(Boolean withTime) {
-        return withTime ? "[发送时间]: %s\n[消息内容]: %s".formatted(this.time, this.content) : this.content;
+        return withTime ? "%s [消息发送时间 %s]".formatted(this.content, this.time) : this.content;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.tropicalalgae.minechat.network.packets;
 
+import cn.tropicalalgae.minechat.common.gpt.GPTEmotionAnalyst;
 import cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager;
 import cn.tropicalalgae.minechat.common.gpt.GPTTextTalker;
 import net.minecraft.ChatFormatting;
@@ -53,6 +54,11 @@ public class SendGPTRequestPacket {
                             this.receiverUUID,
                             new GPTTextTalker(sender, receiver, this.message, server)
                     );
+                    GPTTalkerManager.runAsync(
+                            this.receiverUUID,
+                            new GPTEmotionAnalyst(sender, receiver)
+                    );
+
                 } else {
                     Component message = Component.literal("You are unable to chat due to certain reasons.")
                             .withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW));

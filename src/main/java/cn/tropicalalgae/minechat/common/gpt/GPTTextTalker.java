@@ -6,6 +6,9 @@ import cn.tropicalalgae.minechat.common.model.IChatMessage;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.common.model.impl.TextMessage;
 import cn.tropicalalgae.minechat.utils.Config;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -14,14 +17,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 
 import static cn.tropicalalgae.minechat.MineChat.LOGGER;
+import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.gptRun;
+import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.gptRunContext;
 import static cn.tropicalalgae.minechat.utils.Util.*;
 
 
@@ -46,6 +47,23 @@ public class GPTTextTalker implements Runnable {
         this.server = server;
     }
 
+
+    private static String buildEntityNameRequestBody(String entityType) {
+        JsonObject root = new JsonObject();
+        JsonArray messages = new JsonArray();
+
+        JsonObject msgContent = new JsonObject();
+        msgContent.addProperty("role", "user");
+        msgContent.addProperty("content",
+                String.format(ENTITY_NAME_PROMPT.formatted(entityType, Config.USER_LANGUAGE.toString()))
+        );
+
+        messages.add(msgContent);
+        root.addProperty("model", Config.GPT_MODEL.get());
+        root.add("messages", messages);
+        return new Gson().toJson(root);
+    }
+
     @Override
     public void run() {
         if (isEntitySupportText(this.receiver)) {
@@ -56,7 +74,7 @@ public class GPTTextTalker implements Runnable {
                 if (memory.isInitialized()) {
                     // 运行时，首次对话尝试命名
                     if (receiverName == null) {
-                        receiverName = run(buildEntityNameRequestBody(this.receiver.getType().toString()));
+                        receiverName = gptRun(buildEntityNameRequestBody(this.receiver.getType().toString()));
                         receiverName = (receiverName == null) ? "Tropical Algae" : receiverName;
                         memory.setRoleName(receiverName);
                         LOGGER.info("Init entity name [%s]".formatted(receiverName));
@@ -72,7 +90,7 @@ public class GPTTextTalker implements Runnable {
                         this.senderName, this.senderUUID, null, this.message, true
                 );
                 memory.addNewMessage(msgCont);
-                String reply = runContext(memory);
+                String reply = gptRunContext(memory);
 
                 Component replyComp;
                 if (reply != null) {
@@ -97,33 +115,5 @@ public class GPTTextTalker implements Runnable {
         }
     }
 
-    @Nullable
-    public static String run(String requestBody) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(Config.GPT_API.get()))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + Config.GPT_KEY.get())
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
-                .build();
-        try {
-            // Get response
-            HttpClient client = HttpClient.newHttpClient();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 200) {
-                return getOpenaiBasedResponseContent(response);
-                //player.sendSystemMessage(Component.literal("<Villager%s>: %s".formatted(chatID, responseContent)));
-            }
-            return null;
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static <T extends IChatMessage> String runContext(IEntityMemory<T> memory) {
-        String requestBody = memory.getChatRequestBody();
-        return run(requestBody);
-    }
 }
