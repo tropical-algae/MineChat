@@ -51,7 +51,7 @@ public class GPTEmotionAnalyst implements Runnable {
 
     @Override
     public void run() {
-        if (isEntitySupported(this.subject, MessageType.EVENT)) {
+        if (isEntitySupported(this.subject, MessageType.CHAT)) {
             // 尝试获取两人历史对话
             this.subject.getCapability(ModCapabilities.CHAT_MEMORY).ifPresent(memory -> {
                 List<ChatMessage> messages = memory.getMessagesBySenderUUID(this.target.getUUID());
@@ -77,8 +77,13 @@ public class GPTEmotionAnalyst implements Runnable {
                     }
                     String requestBody = sentAnalysisRequestBody(context.toString());
                     String scoreStr = gptRun(requestBody);
+                    this.subject.getCapability(ModCapabilities.ENTITY_ATTRIBUTE).ifPresent(attribute -> {
+                        attribute.setEmotionScore(
+                                this.target.getUUID(),
+                                NumberUtils.toFloat(scoreStr, 0f)
+                        );
+                    });
 
-                    float score = NumberUtils.toFloat(scoreStr, 0f);
                 }
             });
         }

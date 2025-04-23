@@ -25,10 +25,10 @@ public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
         ListTag messages = new ListTag();
-        for (ChatMessage msg : memory.getHistory()) {
+        for (ChatMessage msg : this.memory.getHistory()) {
             messages.add(msg.toNBT());
         }
-        String roleName = memory.getRoleName();
+        String roleName = this.memory.getRoleName();
         tag.put("messages", messages);
         tag.putString("roleName", (roleName == null) ? "" : roleName);
         return tag;
@@ -36,7 +36,7 @@ public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        memory.getHistory().clear();
+        this.memory.getHistory().clear();
         ListTag messages = nbt.getList("messages", Tag.TAG_COMPOUND);
         String roleName = nbt.getString("roleName");
         for (Tag t : messages) {
@@ -44,6 +44,6 @@ public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable
                 memory.addNewMessage(new ChatMessage(ct));
             }
         }
-        memory.setRoleName((roleName.equals("")) ? null : roleName);
+        this.memory.setRoleName((roleName.equals("")) ? null : roleName);
     }
 }

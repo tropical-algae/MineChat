@@ -13,7 +13,7 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static cn.tropicalalgae.minechat.utils.Util.getVillagePrompt;
+import static cn.tropicalalgae.minechat.utils.Util.getEntityPrompt;
 import static cn.tropicalalgae.minechat.utils.Util.SYS_PROMPT_SUFFIX;
 
 
@@ -41,15 +41,7 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
 
     @Override
     public void setRolePrompt(Entity entity) {
-        if (entity instanceof Villager villager) {
-            VillagerProfession profession = villager.getVillagerData().getProfession();
-            String prompt = getVillagePrompt(profession);
-            this.rolePrompt = ((prompt == null) || (prompt.equals(""))) ? this.rolePrompt : prompt;
-//            Map<String, String> promptMap = MineChatConfig.VILLAGER_PROMPT.get();
-//            if (promptMap != null && promptMap.containsKey(profession)) {
-//                this.rolePrompt = promptMap.get(profession);
-//            }
-        }
+        this.rolePrompt = getEntityPrompt(entity);
         this.hasRolePrompt = true;
     }
 

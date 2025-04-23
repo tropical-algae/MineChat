@@ -18,11 +18,11 @@ import java.util.UUID;
 
 public class Util {
 
-    public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_TEXT = List.of(
+    public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_CHAT = List.of(
             Villager.class
     );
     public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_EVENT = List.of(
-            Villager.class
+//            Villager.class
     );
 
     public static String NULL_MSG_UUID = "NULL_UUID";
@@ -101,7 +101,7 @@ public class Util {
         }
         switch (messageType) {
             case CHAT -> {
-                return ENTITIES_SUPPORTED_TEXT.stream()
+                return ENTITIES_SUPPORTED_CHAT.stream()
                         .anyMatch(clazz -> clazz.isAssignableFrom(entity.getClass()));
             }
             case EVENT -> {
@@ -116,14 +116,18 @@ public class Util {
 
 
     @Nullable
-    public static String getVillagePrompt(VillagerProfession profession) {
-        if (profession.equals(VillagerProfession.FARMER)) {
-            return Config.FAMOUS_PROMPT.get();
-        } else if (profession.equals(VillagerProfession.ARMORER)) {
-            return Config.FAMOUS_PROMPT.get();
-        } else {
-            return null;
+    public static String getEntityPrompt(Entity entity) {
+        if (entity instanceof Villager villager) {
+            VillagerProfession profession = villager.getVillagerData().getProfession();
+            if (profession.equals(VillagerProfession.FARMER)) {
+                return Config.FAMOUS_PROMPT.get();
+            } else if (profession.equals(VillagerProfession.ARMORER)) {
+                return Config.ARMORER_PROMPT.get();
+            } else {
+                return Config.DEFAULT_PROMPT.get();
+            }
         }
+        return Config.DEFAULT_PROMPT.get();
     }
 
     public static Boolean canPlayerTalkToEntity(String playerName) {
