@@ -24,7 +24,7 @@ public class Config {
 
     public static ForgeConfigSpec.BooleanValue AFFINITY_ENABLED;
     public static ForgeConfigSpec.ConfigValue<Integer> AFFINITY_CONTEXT_LENGTH;
-
+    public static ForgeConfigSpec.FloatValue MAX_COST_ADJUST_RATIO;
 
 
     static {
@@ -106,11 +106,16 @@ public class Config {
         builder.comment("Config for villager affinity").push("affinity_config");
 
          AFFINITY_ENABLED = builder
-                .comment("Use white list or not. If True, only the players who on the white_list can chat with entities (villager).")
+                .comment("Enable Emotion Analysis. If True, the transaction with villagers will be influenced by your actions.")
                 .define("affinity_enable", true);
+
          AFFINITY_CONTEXT_LENGTH = builder
                 .comment("The required number of conversations triggered by discount detection")
-                .define("affinity_context_length", 6);
+                .define("affinity_context_length", 8);
+
+         MAX_COST_ADJUST_RATIO = builder
+                 .comment("Maximum price fluctuation ratio for transaction")
+                 .defineInRange("max_cost_adjust_ratio", 0.5f, 0.0f, 1.0f);
 
         builder.pop();
 

@@ -3,6 +3,7 @@ package cn.tropicalalgae.minechat.common.events;
 
 import cn.tropicalalgae.minechat.MineChat;
 import cn.tropicalalgae.minechat.common.capability.ChatMemoryProvider;
+import cn.tropicalalgae.minechat.common.capability.EntityAttributeProvider;
 import cn.tropicalalgae.minechat.common.enumeration.MessageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -27,6 +28,10 @@ public class CapabilityAttachEvent {
                 event.addCapability(
                         new ResourceLocation(MineChat.MOD_ID, "chat_memory"),
                         new ChatMemoryProvider()
+                );
+                event.addCapability(
+                        new ResourceLocation(MineChat.MOD_ID, "entity_attribute"),
+                        new EntityAttributeProvider()
                 );
             }
 //            // 加载Event Memory
