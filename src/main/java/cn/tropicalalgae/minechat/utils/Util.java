@@ -18,10 +18,29 @@ public class Util {
 
     public static String NULL_MSG_UUID = "NULL_UUID";
 
-    public static String sysPromptSuffix = "%s\n重要提示：现在的时间是%s (仅作为一个参考)。" +
-            "你的名字叫%s，历史消息中的用户可能来自不同的人，但在最新的消息来自%s";
-    public static String entityNamePrompt = "快问快答：请你为%s起一个具体的名字，可以是中文或英文。" +
-            "要求风格和名字随机一点，不考虑性别。直接输出结果，不要解释:";
+    public static String SYS_PROMPT_SUFFIX = """
+            %s
+            提示：现在的时间是%s，你的名字叫%s，当前你在与%s对话 (该信息仅用于辅助你感知环境，请勿用于回复)
+            语种要求：必须使用%s回复
+            """.stripIndent();
+    public static String ENTITY_NAME_PROMPT = """
+            你是一个起名大师，擅长为人们起名字。你现在的任务是为%s起一个名字。
+            规则如下：
+            - 名字随机，风格也随机（帅气、可爱、幽默、抽象、猎奇）
+            - 名字长度在2~12个字符之间，不要使用通用词或无意义的词汇组合
+            - 只返回名字本身，不要加说明或解释。
+            - 名字使用的语种：%s
+            请输出
+            """.stripIndent();
+
+    public static String SA_PROMPT = """
+            你是一个情感分析专家，擅长排除表面语言的误导（如反话、敷衍、讨好、情绪波动等）,从复杂对话中判断一个人对他人的真实情感（如喜欢、讨厌、关心、冷漠）
+            现在我将提供一段对话，请你判断其中“对方”对“我”的真实情感倾向，并给出一个分数，表示“对方是否真的喜欢我”。请注意：
+            - 分数范围为 -1 到 1，-1 表示非常不喜欢，1 表示非常喜欢；
+            - 不要轻易给出极端值；
+            - 如果对方言语暧昧、态度反复，请综合判断其潜在态度；
+            - 只输出数字分数，不需要解释。
+            """.stripIndent();
 
     public static String getOpenaiBasedResponseContent(HttpResponse<String> response) {
         JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
@@ -75,19 +94,6 @@ public class Util {
                 .anyMatch(clazz -> clazz.isAssignableFrom(entity.getClass()));
     }
 
-    public static String buildEntityNameRequestBody(String entityType) {
-        JsonObject root = new JsonObject();
-        JsonArray messages = new JsonArray();
-
-        JsonObject msgContent = new JsonObject();
-        msgContent.addProperty("role", "user");
-        msgContent.addProperty("content", String.format(entityNamePrompt.formatted(entityType)));
-
-        messages.add(msgContent);
-        root.addProperty("model", Config.GPT_MODEL.get());
-        root.add("messages", messages);
-        return new Gson().toJson(root);
-    }
 
     @Nullable
     public static String getVillagePrompt(VillagerProfession profession) {

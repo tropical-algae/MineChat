@@ -19,6 +19,7 @@ public interface IEntityMemory <T extends IChatMessage> {
     String getChatRequestBody();
     void addNewMessage(IChatMessage newMessage);
     List<T> getHistory();
-    Map<UUID, List<T>> getMessageMapSender();
-    Map<UUID, UUID> getMessageReplyMap();
+    T getMessageByUUID(UUID messageUUID);
+    T getReplyMessageByUUID(UUID messageUUID);
+    List<T> getMessagesBySenderUUID(UUID senderUUID);
 }

@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static cn.tropicalalgae.minechat.utils.Util.getVillagePrompt;
-import static cn.tropicalalgae.minechat.utils.Util.sysPromptSuffix;
+import static cn.tropicalalgae.minechat.utils.Util.SYS_PROMPT_SUFFIX;
 
 
 public class TextMemory implements IEntityMemory<TextMessage> {
@@ -77,8 +77,8 @@ public class TextMemory implements IEntityMemory<TextMessage> {
 
         // 设置系统提示词
         TextMessage latestMsg = this.history.get(this.history.size() - 1);
-        String sysPrompt = sysPromptSuffix.formatted(
-                this.rolePrompt, latestMsg.time, this.roleName, latestMsg.senderName
+        String sysPrompt = SYS_PROMPT_SUFFIX.formatted(
+                this.rolePrompt, latestMsg.time, this.roleName, latestMsg.senderName, Config.USER_LANGUAGE
         );
 
         JsonObject sysMsgContent = new JsonObject();
@@ -99,16 +99,6 @@ public class TextMemory implements IEntityMemory<TextMessage> {
             }
             messages.add(msgContent);
         }
-
-//        for (TextMessage msg : this.history) {
-//            JsonObject msgContent = new JsonObject();
-//            msgContent.addProperty("role", msg.fromPlayer ? "user" : "assistant");
-//            msgContent.addProperty("content", msg.getMessage(false));
-//            if (msg.fromPlayer) {
-//                msgContent.addProperty("name", msg.sender_name);
-//            }
-//            messages.add(msgContent);
-//        }
         root.addProperty("model", Config.GPT_MODEL.get());
         root.add("messages", messages);
         return new Gson().toJson(root);
@@ -116,9 +106,6 @@ public class TextMemory implements IEntityMemory<TextMessage> {
 
     @Override
     public void addNewMessage(IChatMessage newMessage) {
-//        if (this.history.size() >= Config.CONTEXT_LENGTH.get()) {
-//            this.history.pollFirst();
-//        }
         // TODO 添加高性能的历史截断方法
         if (newMessage instanceof TextMessage textMessage) {
             if (textMessage.getRepliedUUID() != null) {
@@ -138,8 +125,21 @@ public class TextMemory implements IEntityMemory<TextMessage> {
     }
 
     @Override
-    public Map<UUID, List<TextMessage>> getMessageMapSender() { return this.messageMapSender; }
+    public TextMessage getMessageByUUID(UUID messageUUID) {
+        return this.messageMapID.get(messageUUID);
+    }
 
     @Override
-    public Map<UUID, UUID> getMessageReplyMap() {return this.messageReplyMap; }
+    public TextMessage getReplyMessageByUUID(UUID messageUUID) {
+        UUID replyMessageUUID = this.messageReplyMap.get(messageUUID);
+        if (replyMessageUUID != null) {
+            return getMessageByUUID(replyMessageUUID);
+        }
+        return null;
+    }
+
+    @Override
+    public List<TextMessage> getMessagesBySenderUUID(UUID senderUUID) {
+        return this.messageMapSender.get(senderUUID);
+    }
 }

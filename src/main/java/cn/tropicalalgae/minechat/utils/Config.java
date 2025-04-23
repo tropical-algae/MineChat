@@ -1,5 +1,6 @@
 package cn.tropicalalgae.minechat.utils;
 
+import cn.tropicalalgae.minechat.common.enumeration.LanguageType;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
@@ -10,6 +11,8 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> GPT_KEY;
     public static final ForgeConfigSpec.ConfigValue<String> GPT_MODEL;
     public static final ForgeConfigSpec.ConfigValue<Integer> CONTEXT_LENGTH;
+
+    public static final ForgeConfigSpec.EnumValue<LanguageType> USER_LANGUAGE;
     public static final ForgeConfigSpec.ConfigValue<String> DEFAULT_PROMPT;
     public static final ForgeConfigSpec.ConfigValue<String> FAMOUS_PROMPT;
     public static final ForgeConfigSpec.ConfigValue<String> ARMORER_PROMPT;
@@ -44,12 +47,17 @@ public class Config {
 
         CONTEXT_LENGTH = builder
                 .comment("Max context length for each chat")
-                .define("context_length", 10);
+                .define("context_length", 8);
 
         builder.pop();
 
         /* prompt管理 */
         builder.comment("Config for prompt").push("prompt_config");
+
+        USER_LANGUAGE = builder
+                .comment("The language used during user interaction. Default Chinese")
+                .translation("LanguageType")
+                .defineEnum("user_language", LanguageType.Chinese);
 
         DEFAULT_PROMPT = builder
                 .comment("Default prompt for villagers of all professions")
@@ -99,10 +107,10 @@ public class Config {
 
          AFFINITY_ENABLED = builder
                 .comment("Use white list or not. If True, only the players who on the white_list can chat with entities (villager).")
-                .define("affinity_enable", false);
+                .define("affinity_enable", true);
          AFFINITY_CONTEXT_LENGTH = builder
                 .comment("The required number of conversations triggered by discount detection")
-                .define("affinity_context_length", 10);
+                .define("affinity_context_length", 6);
 
         builder.pop();
 
