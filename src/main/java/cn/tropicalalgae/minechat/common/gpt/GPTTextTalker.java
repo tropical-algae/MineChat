@@ -2,9 +2,8 @@ package cn.tropicalalgae.minechat.common.gpt;
 
 
 import cn.tropicalalgae.minechat.common.capability.ModCapabilities;
-import cn.tropicalalgae.minechat.common.model.IChatMessage;
-import cn.tropicalalgae.minechat.common.model.IEntityMemory;
-import cn.tropicalalgae.minechat.common.model.impl.TextMessage;
+import cn.tropicalalgae.minechat.common.enumeration.MessageType;
+import cn.tropicalalgae.minechat.common.model.impl.ChatMessage;
 import cn.tropicalalgae.minechat.utils.Config;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -16,8 +15,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.Nullable;
-import java.util.List;
 import java.util.UUID;
 
 import static cn.tropicalalgae.minechat.MineChat.LOGGER;
@@ -55,7 +52,7 @@ public class GPTTextTalker implements Runnable {
         JsonObject msgContent = new JsonObject();
         msgContent.addProperty("role", "user");
         msgContent.addProperty("content",
-                String.format(ENTITY_NAME_PROMPT.formatted(entityType, Config.USER_LANGUAGE.toString()))
+                String.format(ENTITY_NAME_PROMPT.formatted(entityType, Config.USER_LANGUAGE.get().toString()))
         );
 
         messages.add(msgContent);
@@ -66,9 +63,9 @@ public class GPTTextTalker implements Runnable {
 
     @Override
     public void run() {
-        if (isEntitySupportText(this.receiver)) {
+        if (isEntitySupported(this.receiver, MessageType.CHAT)) {
             // 尝试获取memory
-            this.receiver.getCapability(ModCapabilities.TEXT_MEMORY).ifPresent(memory -> {
+            this.receiver.getCapability(ModCapabilities.CHAT_MEMORY).ifPresent(memory -> {
                 String receiverName = memory.getRoleName();
 
                 if (memory.isInitialized()) {
@@ -86,7 +83,7 @@ public class GPTTextTalker implements Runnable {
                     }
                 }
                 // 更新记忆（玩家消息）
-                TextMessage msgCont = new TextMessage(
+                ChatMessage msgCont = new ChatMessage(
                         this.senderName, this.senderUUID, null, this.message, true
                 );
                 memory.addNewMessage(msgCont);
@@ -95,7 +92,7 @@ public class GPTTextTalker implements Runnable {
                 Component replyComp;
                 if (reply != null) {
                     // 更新记忆（模型消息），广播消息
-                    TextMessage rplCont = new TextMessage(
+                    ChatMessage rplCont = new ChatMessage(
                             receiverName, this.receiverUUID, msgCont.getUUID(), reply, false
                     );
                     memory.addNewMessage(rplCont);
