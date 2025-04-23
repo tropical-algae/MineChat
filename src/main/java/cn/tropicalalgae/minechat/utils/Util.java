@@ -1,10 +1,11 @@
 package cn.tropicalalgae.minechat.utils;
 
 
-import cn.tropicalalgae.minechat.MineChat;
+import cn.tropicalalgae.minechat.common.enumeration.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.Level;
 import com.google.gson.*;
@@ -12,16 +13,24 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.UUID;
 
 public class Util {
+
+    public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_TEXT = List.of(
+            Villager.class
+    );
+    public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_EVENT = List.of(
+            Villager.class
+    );
 
     public static String NULL_MSG_UUID = "NULL_UUID";
 
     public static String SYS_PROMPT_SUFFIX = """
             %s
             提示：现在的时间是%s，你的名字叫%s，当前你在与%s对话 (该信息仅用于辅助你感知环境，请勿用于回复)
-            语种要求：必须使用%s回复
+            郑重要求：回复时使用的语言必须是%s
             """.stripIndent();
     public static String ENTITY_NAME_PROMPT = """
             你是一个起名大师，擅长为人们起名字。你现在的任务是为%s起一个名字。
@@ -29,7 +38,7 @@ public class Util {
             - 名字随机，风格也随机（帅气、可爱、幽默、抽象、猎奇）
             - 名字长度在2~12个字符之间，不要使用通用词或无意义的词汇组合
             - 只返回名字本身，不要加说明或解释。
-            - 名字使用的语种：%s
+            - 名字使用的语言：%s
             请输出
             """.stripIndent();
 
@@ -85,13 +94,24 @@ public class Util {
         return null; // nothing
     }
 
-    public static boolean isEntitySupportText(Entity entity) {
+    public static boolean isEntitySupported(Entity entity, MessageType messageType) {
         /* 判断是否是适用文本交流的实体 */
-        if (entity == null) {
+        if (entity == null | messageType == null | !Config.MOD_ENABLE.get()) {
             return false;
         }
-        return MineChat.ENTITIES_SUPPORTED_TEXT.stream()
-                .anyMatch(clazz -> clazz.isAssignableFrom(entity.getClass()));
+        switch (messageType) {
+            case CHAT -> {
+                return ENTITIES_SUPPORTED_TEXT.stream()
+                        .anyMatch(clazz -> clazz.isAssignableFrom(entity.getClass()));
+            }
+            case EVENT -> {
+                return ENTITIES_SUPPORTED_EVENT.stream()
+                        .anyMatch(clazz -> clazz.isAssignableFrom(entity.getClass()));
+            }
+            default -> {
+                return false;
+            }
+        }
     }
 
 

@@ -1,6 +1,6 @@
 package cn.tropicalalgae.minechat.common.model.impl;
 
-import cn.tropicalalgae.minechat.common.model.IChatMessage;
+import cn.tropicalalgae.minechat.common.model.IEntityMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 
@@ -10,7 +10,7 @@ import static cn.tropicalalgae.minechat.utils.Util.NULL_MSG_UUID;
 import static cn.tropicalalgae.minechat.utils.Util.getCurrentMinecraftTime;
 
 
-public class TextMessage implements IChatMessage {
+public class ChatMessage implements IEntityMessage {
     private final UUID uuid;
     private final UUID repliedUUID;
     private final UUID senderUUID;
@@ -19,7 +19,7 @@ public class TextMessage implements IChatMessage {
     public Boolean fromPlayer;
     public String time;
 
-    public TextMessage(String senderName, UUID senderUUID, UUID repliedUUID, String content, Boolean fromPlayer) {
+    public ChatMessage(String senderName, UUID senderUUID, UUID repliedUUID, String content, Boolean fromPlayer) {
         this.uuid = UUID.randomUUID();
         this.senderUUID = senderUUID;
         this.senderName = senderName;
@@ -29,7 +29,7 @@ public class TextMessage implements IChatMessage {
         this.time = getCurrentMinecraftTime();
     }
 
-    public TextMessage(CompoundTag tag) {
+    public ChatMessage(CompoundTag tag) {
         String fakeRepliedUUID = tag.getString("repliedUUID");
 
         this.uuid = tag.contains("uuid", Tag.TAG_INT_ARRAY) ? tag.getUUID("uuid") : UUID.randomUUID();

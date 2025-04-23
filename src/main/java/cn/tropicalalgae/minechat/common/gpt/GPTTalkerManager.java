@@ -1,6 +1,6 @@
 package cn.tropicalalgae.minechat.common.gpt;
 
-import cn.tropicalalgae.minechat.common.model.IChatMessage;
+import cn.tropicalalgae.minechat.common.model.IEntityMessage;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.utils.Config;
 
@@ -29,7 +29,7 @@ public class GPTTalkerManager {
     }
 
     @Nullable
-    public static <T extends IChatMessage> String gptRunContext(IEntityMemory<T> memory) {
+    public static <T extends IEntityMessage> String gptRunContext(IEntityMemory<T> memory) {
         String requestBody = memory.getChatRequestBody();
         return gptRun(requestBody);
     }

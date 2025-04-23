@@ -1,20 +1,18 @@
 package cn.tropicalalgae.minechat.common.gpt;
 
 import cn.tropicalalgae.minechat.common.capability.ModCapabilities;
-import cn.tropicalalgae.minechat.common.model.impl.TextMessage;
+import cn.tropicalalgae.minechat.common.enumeration.MessageType;
+import cn.tropicalalgae.minechat.common.model.impl.ChatMessage;
 import cn.tropicalalgae.minechat.utils.Config;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.gptRun;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static cn.tropicalalgae.minechat.utils.Util.*;
 
@@ -53,10 +51,10 @@ public class GPTEmotionAnalyst implements Runnable {
 
     @Override
     public void run() {
-        if (isEntitySupportText(this.subject)) {
+        if (isEntitySupported(this.subject, MessageType.EVENT)) {
             // 尝试获取两人历史对话
-            this.subject.getCapability(ModCapabilities.TEXT_MEMORY).ifPresent(memory -> {
-                List<TextMessage> messages = memory.getMessagesBySenderUUID(this.target.getUUID());
+            this.subject.getCapability(ModCapabilities.CHAT_MEMORY).ifPresent(memory -> {
+                List<ChatMessage> messages = memory.getMessagesBySenderUUID(this.target.getUUID());
                 if (messages == null) {
                     return ;
                 }
@@ -72,9 +70,9 @@ public class GPTEmotionAnalyst implements Runnable {
 
                     // 收集对话信息
                     for (int i = start; i < length; i++) {
-                        TextMessage msg = messages.get(i);
+                        ChatMessage msg = messages.get(i);
                         context.append("对方：%s".formatted(msg.getMessage(true))).append(newLine);
-                        TextMessage replyMsg = memory.getReplyMessageByUUID(msg.getUUID());
+                        ChatMessage replyMsg = memory.getReplyMessageByUUID(msg.getUUID());
                         context.append("你：%s".formatted(replyMsg.getMessage(true))).append(newLine);
                     }
                     String requestBody = sentAnalysisRequestBody(context.toString());

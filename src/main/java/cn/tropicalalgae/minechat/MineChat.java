@@ -25,9 +25,7 @@ public class MineChat
     public static final String MOD_ID = "minechat";
     public static final String MOD_VERSION = "0.1.1";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final List<Class<? extends Entity>> ENTITIES_SUPPORTED_TEXT = List.of(
-            Villager.class
-    );
+
 
     @SuppressWarnings("removal")
     public MineChat()

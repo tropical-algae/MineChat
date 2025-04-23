@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 
 import java.util.UUID;
 
-public interface IChatMessage {
+public interface IEntityMessage {
     UUID getUUID();
     UUID getSenderUUID();
     UUID getRepliedUUID();
