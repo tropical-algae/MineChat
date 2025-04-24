@@ -9,10 +9,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -22,8 +24,15 @@ public class EntityAttributeProvider implements ICapabilityProvider, INBTSeriali
     private final LazyOptional<EntityAttribute> optional = LazyOptional.of(() -> attribute);
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+    @NotNull
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         return cap == ModCapabilities.ENTITY_ATTRIBUTE ? optional.cast() : LazyOptional.empty();
+    }
+
+    public static EntityAttribute getEntityAttribute(Entity entity) {
+        return entity.getCapability(ModCapabilities.ENTITY_ATTRIBUTE)
+                .resolve()
+                .orElse(null);
     }
 
     @Override

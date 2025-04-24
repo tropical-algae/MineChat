@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class Util {
 
@@ -33,10 +34,10 @@ public class Util {
             郑重要求：回复时使用的语言必须是%s
             """.stripIndent();
     public static String ENTITY_NAME_PROMPT = """
-            你是一个起名大师，擅长为人们起名字。你现在的任务是为%s起一个名字。
+            你是一个起名大师，擅长为人们起名字。你现在的任务是为一个男生/女生起一个名字。
             规则如下：
-            - 名字随机，风格也随机（帅气、可爱、幽默、抽象、猎奇）
-            - 名字长度在2~12个字符之间，不要使用通用词或无意义的词汇组合
+            - 名字风格随机（帅气、可爱、幽默、抽象、猎奇）
+            - 名字长度在2~12个字符之间
             - 只返回名字本身，不要加说明或解释。
             - 名字使用的语言：%s
             请输出
@@ -141,18 +142,4 @@ public class Util {
             }
         }
     }
-
-//    private static int calculateCustomOffset(Villager villager, MerchantOffer offer, Player player) {
-//        // 举例：对“图书管理员”村民加价 2
-//        if (villager.getVillagerData().getProfession() == VillagerProfession.LIBRARIAN) {
-//            return +2; // 涨价
-//        }
-//
-//        // 举例：对新玩家全部交易减 1
-//        if (player.getExperienceLevel() < 5) {
-//            return -1; // 打折
-//        }
-//
-//        return 0; // 默认无变化
-//    }
 }

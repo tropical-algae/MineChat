@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
+/* bu hui xie java, qing pen */
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(MineChat.MOD_ID)
 public class MineChat
