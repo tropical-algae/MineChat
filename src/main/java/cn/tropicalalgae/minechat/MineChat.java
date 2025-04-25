@@ -25,7 +25,6 @@ import java.util.List;
 public class MineChat
 {
     public static final String MOD_ID = "minechat";
-    public static final String MOD_VERSION = "0.1.2";
     public static final Logger LOGGER = LogUtils.getLogger();
 
 
