@@ -18,9 +18,6 @@ public class EventMemory implements IEntityMemory<EventMessage> {
     }
 
     @Override
-    public Boolean isInitialized() { return this.isInitialized; }
-
-    @Override
     public String getChatRequestBody() { return null; }
 
     @Override

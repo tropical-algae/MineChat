@@ -3,14 +3,10 @@ package cn.tropicalalgae.minechat.common.model.impl;
 import cn.tropicalalgae.minechat.common.model.IEntityMessage;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.utils.Config;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.buildRequestBody;
@@ -27,17 +23,9 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
     private final Map<UUID, List<ChatMessage>> messageMapSender = new HashMap<>();
     private final Map<UUID, UUID> messageReplyMap = new HashMap<>(); // 消息之间的回复关系 消息：消息的回复
 
-    /* 状态判断参数 */
-    private Boolean isInitialized = false;
-
 
     public ChatMemory(Entity entity) {
         this.entity = entity;
-        this.isInitialized = true;
-    }
-
-    public Boolean isInitialized() {
-        return this.isInitialized;
     }
 
     @Override
@@ -49,8 +37,8 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
         ChatMessage latestMsg = this.history.get(this.history.size() - 1);
         String sysPrompt = SYS_PROMPT_SUFFIX.formatted(
                 getEntityPrompt(entity),
-                latestMsg.time,
                 getEntityCustomName(this.entity),
+                latestMsg.time,
                 latestMsg.senderName,
                 Config.USER_LANGUAGE.get().toString()
         );

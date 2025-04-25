@@ -1,7 +1,6 @@
 package cn.tropicalalgae.minechat.common.gpt;
 
 
-import cn.tropicalalgae.minechat.common.capability.ModCapabilities;
 import cn.tropicalalgae.minechat.common.enumeration.MessageType;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.common.model.impl.ChatMessage;
@@ -17,11 +16,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 import static cn.tropicalalgae.minechat.MineChat.LOGGER;
 import static cn.tropicalalgae.minechat.common.capability.ChatMemoryProvider.getChatMemory;
-import static cn.tropicalalgae.minechat.common.capability.EntityAttributeProvider.getEntityAttribute;
 import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.gptRun;
 import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.gptRunContext;
 import static cn.tropicalalgae.minechat.utils.Util.*;
@@ -41,6 +37,7 @@ public class GPTTextTalker implements Runnable {
         this.receiver = receiver;
         this.message = message;
         this.server = server;
+        initReceiverName();
     }
 
     private static String buildEntityNameRequestBody() {
@@ -74,26 +71,19 @@ public class GPTTextTalker implements Runnable {
         return false;
     }
 
-    private void initReceiverAndGetName() {
-        if (this.memory.isInitialized()) {
-            // TODO 懒加载 能否再进一步优化？
-            if (this.receiver.getCustomName() == null) {
-                String receiverName = gptRun(buildEntityNameRequestBody());
-                receiverName = (receiverName == null) ? "Tropical Algae" : receiverName;
-                this.receiver.setCustomName(Component.literal(receiverName));
-                LOGGER.info("Init entity name [%s]".formatted(receiverName));
-            }
-//            if (!this.memory.hasRolePrompt()) {
-//                this.memory.setRolePrompt(this.receiver);
-//                LOGGER.info("Init prompt for entity [%s]".formatted(getEntityCustomName(this.receiver)));
-//            }
+    private void initReceiverName() {
+        if (this.receiver.getCustomName() == null) {
+            String receiverName = gptRun(buildEntityNameRequestBody());
+            receiverName = (receiverName == null) ? "Tropical Algae" : receiverName;
+            this.receiver.setCustomName(Component.literal(receiverName));
+            LOGGER.info("Init entity name [%s]".formatted(receiverName));
         }
     }
 
     @Override
     public void run() {
         if (canReceiverTalk()){
-            initReceiverAndGetName();
+
             // 更新记忆（玩家消息）
             ChatMessage msgCont = new ChatMessage(this.sender, this.message, null);
             this.memory.addNewMessage(msgCont);

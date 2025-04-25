@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IEntityMemory <T extends IEntityMessage> {
-    Boolean isInitialized();
     String getChatRequestBody();
     void addNewMessage(IEntityMessage newMessage);
     List<T> getHistory();
