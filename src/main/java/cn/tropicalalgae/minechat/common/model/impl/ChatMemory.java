@@ -13,48 +13,28 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static cn.tropicalalgae.minechat.utils.Util.getEntityPrompt;
-import static cn.tropicalalgae.minechat.utils.Util.SYS_PROMPT_SUFFIX;
+import static cn.tropicalalgae.minechat.common.gpt.GPTTalkerManager.buildRequestBody;
+import static cn.tropicalalgae.minechat.utils.Util.*;
 
 
 public class ChatMemory implements IEntityMemory<ChatMessage> {
+    private final Entity entity;
     /* 持久化参数 */
     private final List<ChatMessage> history = new ArrayList<>();
-    private String roleName = null;
 
     /* 动态获取de参数 */
-    private String rolePrompt;
     private final Map<UUID, ChatMessage> messageMapID = new HashMap<>();
     private final Map<UUID, List<ChatMessage>> messageMapSender = new HashMap<>();
     private final Map<UUID, UUID> messageReplyMap = new HashMap<>(); // 消息之间的回复关系 消息：消息的回复
 
     /* 状态判断参数 */
     private Boolean isInitialized = false;
-    private Boolean hasRolePrompt;
 
 
-    public ChatMemory() {
-        this.rolePrompt = Config.DEFAULT_PROMPT.get();
+    public ChatMemory(Entity entity) {
+        this.entity = entity;
         this.isInitialized = true;
-        this.hasRolePrompt = false;
     }
-
-    @Override
-    public void setRolePrompt(Entity entity) {
-        this.rolePrompt = getEntityPrompt(entity);
-        this.hasRolePrompt = true;
-    }
-
-    @Override
-    public void setRoleName(String roleName) { this.roleName = roleName; }
-
-    @Override
-    @Nullable
-    public String getRoleName() {
-        return this.roleName;
-    }
-
-    public Boolean hasRolePrompt() { return this.hasRolePrompt; }
 
     public Boolean isInitialized() {
         return this.isInitialized;
@@ -62,17 +42,15 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
 
     @Override
     public String getChatRequestBody() {
-
         // 构建请求param
-        JsonObject root = new JsonObject();
         JsonArray messages = new JsonArray();
 
         // 设置系统提示词
         ChatMessage latestMsg = this.history.get(this.history.size() - 1);
         String sysPrompt = SYS_PROMPT_SUFFIX.formatted(
-                this.rolePrompt,
+                getEntityPrompt(entity),
                 latestMsg.time,
-                this.roleName,
+                getEntityCustomName(this.entity),
                 latestMsg.senderName,
                 Config.USER_LANGUAGE.get().toString()
         );
@@ -95,9 +73,7 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
             }
             messages.add(msgContent);
         }
-        root.addProperty("model", Config.GPT_MODEL.get());
-        root.add("messages", messages);
-        return new Gson().toJson(root);
+        return buildRequestBody(messages); // new Gson().toJson(root);
     }
 
     @Override
@@ -122,12 +98,12 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
 
     @Override
     public ChatMessage getMessageByUUID(UUID messageUUID) {
-        return this.messageMapID.get(messageUUID);
+        return this.messageMapID.getOrDefault(messageUUID, null);
     }
 
     @Override
     public ChatMessage getReplyMessageByUUID(UUID messageUUID) {
-        UUID replyMessageUUID = this.messageReplyMap.get(messageUUID);
+        UUID replyMessageUUID = this.messageReplyMap.getOrDefault(messageUUID, null);
         if (replyMessageUUID != null) {
             return getMessageByUUID(replyMessageUUID);
         }
@@ -136,6 +112,6 @@ public class ChatMemory implements IEntityMemory<ChatMessage> {
 
     @Override
     public List<ChatMessage> getMessagesBySenderUUID(UUID senderUUID) {
-        return this.messageMapSender.get(senderUUID);
+        return this.messageMapSender.getOrDefault(senderUUID, null);
     }
 }

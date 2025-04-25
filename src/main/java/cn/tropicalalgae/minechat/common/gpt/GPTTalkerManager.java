@@ -3,6 +3,9 @@ package cn.tropicalalgae.minechat.common.gpt;
 import cn.tropicalalgae.minechat.common.model.IEntityMessage;
 import cn.tropicalalgae.minechat.common.model.IEntityMemory;
 import cn.tropicalalgae.minechat.utils.Config;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -16,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static cn.tropicalalgae.minechat.MineChat.LOGGER;
+import static cn.tropicalalgae.minechat.utils.Util.SA_PROMPT;
 import static cn.tropicalalgae.minechat.utils.Util.getOpenaiBasedResponseContent;
 
 public class GPTTalkerManager {
@@ -28,10 +32,12 @@ public class GPTTalkerManager {
                 .submit(task);
     }
 
-    @Nullable
-    public static <T extends IEntityMessage> String gptRunContext(IEntityMemory<T> memory) {
-        String requestBody = memory.getChatRequestBody();
-        return gptRun(requestBody);
+    public static String buildRequestBody(JsonArray messages) {
+        // 构建请求param
+        JsonObject root = new JsonObject();
+        root.addProperty("model", Config.GPT_MODEL.get());
+        root.add("messages", messages);
+        return new Gson().toJson(root);
     }
 
     @Nullable
@@ -55,5 +61,11 @@ public class GPTTalkerManager {
             LOGGER.info("OpenAI Model Inference ERROR: %s".formatted(e));
             return null;
         }
+    }
+
+    @Nullable
+    public static <T extends IEntityMessage> String gptRunContext(IEntityMemory<T> memory) {
+        String requestBody = memory.getChatRequestBody();
+        return gptRun(requestBody);
     }
 }

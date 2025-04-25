@@ -15,8 +15,13 @@ import javax.annotation.Nullable;
 
 public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private final ChatMemory memory = new ChatMemory();
-    private final LazyOptional<IEntityMemory<ChatMessage>> optional = LazyOptional.of(() -> memory);
+    private final ChatMemory memory;
+    private final LazyOptional<IEntityMemory<ChatMessage>> optional;
+
+    public ChatMemoryProvider(Entity entity) {
+        this.memory = new ChatMemory(entity);
+        this.optional = LazyOptional.of(() -> memory);
+    }
 
     @Override
     @NotNull
@@ -38,9 +43,7 @@ public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable
         for (ChatMessage msg : this.memory.getHistory()) {
             messages.add(msg.toNBT());
         }
-        String roleName = this.memory.getRoleName();
         tag.put("messages", messages);
-        tag.putString("roleName", (roleName == null) ? "" : roleName);
         return tag;
     }
 
@@ -54,6 +57,5 @@ public class ChatMemoryProvider implements ICapabilityProvider, INBTSerializable
                 memory.addNewMessage(new ChatMessage(ct));
             }
         }
-        this.memory.setRoleName((roleName.equals("")) ? null : roleName);
     }
 }

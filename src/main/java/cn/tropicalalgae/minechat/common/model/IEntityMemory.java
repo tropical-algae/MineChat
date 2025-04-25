@@ -7,11 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IEntityMemory <T extends IEntityMessage> {
-    void setRolePrompt(Entity entity);
-    void setRoleName(String roleName);
-    @Nullable
-    String getRoleName();
-    Boolean hasRolePrompt();
     Boolean isInitialized();
     String getChatRequestBody();
     void addNewMessage(IEntityMessage newMessage);
