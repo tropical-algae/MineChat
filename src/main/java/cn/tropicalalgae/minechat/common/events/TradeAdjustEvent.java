@@ -13,8 +13,6 @@ import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.List;
-
 import static cn.tropicalalgae.minechat.utils.Util.isEntitySupported;
 
 @Mod.EventBusSubscriber(modid = MineChat.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -28,7 +26,7 @@ public class TradeAdjustEvent {
 
         // 仅被注册的villager可受到调整
         if (trader instanceof Villager villager) {
-            if (isEntitySupported(villager, MessageType.CHAT) & Config.AFFINITY_ENABLED.get()) {
+            if (isEntitySupported(villager, MessageType.CHAT) & Config.TRADE_ADJUST_ENABLED.get()) {
                 villager.getCapability(ModCapabilities.ENTITY_ATTRIBUTE).ifPresent(attribute -> {
                     // 所有商品都将被调整
                     for (MerchantOffer offer: trader.getOffers()) {

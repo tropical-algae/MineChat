@@ -10,26 +10,12 @@ import java.util.UUID;
 
 public class EventMemory implements IEntityMemory<EventMessage> {
     private Boolean isInitialized = false;
+    private final Entity entity;
 
-    public EventMemory() {
+    public EventMemory(Entity entity) {
+        this.entity = entity;
         this.isInitialized = true;
     }
-
-    @Override
-    public void setRolePrompt(Entity entity) { }
-
-    @Override
-    public void setRoleName(String roleName) { }
-
-    @Nullable
-    @Override
-    public String getRoleName() { return null; }
-    @Override
-
-    public Boolean hasRolePrompt() { return true; }
-
-    @Override
-    public Boolean isInitialized() { return this.isInitialized; }
 
     @Override
     public String getChatRequestBody() { return null; }

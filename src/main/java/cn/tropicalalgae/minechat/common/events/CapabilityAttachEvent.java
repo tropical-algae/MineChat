@@ -27,7 +27,7 @@ public class CapabilityAttachEvent {
                 LOGGER.debug("Init entity memory [ChatMessage], target UUID: %s".formatted(entity.getUUID().toString()));
                 event.addCapability(
                         new ResourceLocation(MineChat.MOD_ID, "chat_memory"),
-                        new ChatMemoryProvider()
+                        new ChatMemoryProvider(entity)
                 );
                 event.addCapability(
                         new ResourceLocation(MineChat.MOD_ID, "entity_attribute"),
@@ -39,7 +39,7 @@ public class CapabilityAttachEvent {
 //                LOGGER.debug("Init entity memory [ChatMessage], target UUID: %s".formatted(entity.getUUID().toString()));
 //                event.addCapability(
 //                        new ResourceLocation(MineChat.MOD_ID, "event_memory"),
-//                        new ChatMemoryProvider()
+//                        new ChatMemoryProvider(entity)
 //                );
 //            }
         }

@@ -22,8 +22,8 @@ public class Config {
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> WHITE_LIST;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLACK_LIST;
 
-    public static ForgeConfigSpec.BooleanValue AFFINITY_ENABLED;
-    public static ForgeConfigSpec.ConfigValue<Integer> AFFINITY_CONTEXT_LENGTH;
+    public static ForgeConfigSpec.BooleanValue TRADE_ADJUST_ENABLED;
+    public static ForgeConfigSpec.ConfigValue<Integer> DISCOUNT_TURNS;
     public static ForgeConfigSpec.FloatValue MAX_COST_ADJUST_RATIO;
 
 
@@ -35,7 +35,7 @@ public class Config {
 
         GPT_API = builder
                 .comment("Model URL that follows the OpenAI API protocol")
-                .define("gpt_api", "https://api.openai.com/v1/chat/completions");
+                .define("gpt_api", "https://api.openai.com/v1");
 
         GPT_KEY = builder
                 .comment("Model API key")
@@ -43,7 +43,7 @@ public class Config {
 
         GPT_MODEL = builder
                 .comment("Model name")
-                .define("gpt_model", "gpt-4o-mini-ca");
+                .define("gpt_model", "gpt-4o-mini");
 
         CONTEXT_LENGTH = builder
                 .comment("Max context length for each chat")
@@ -77,7 +77,7 @@ public class Config {
         builder.comment("Config for player authorization").push("authorization");
 
         MOD_ENABLE = builder
-                .comment("Allow entities to speak or not. If false, entities will not speak with you by llm")
+                .comment("Allow entities to speak or not. If false, entities will not chat anymore")
                 .define("mod_enable", true);
 
         USE_WHITE_LIST = builder
@@ -102,16 +102,16 @@ public class Config {
 
         builder.pop();
 
-        /* 附加功能 好感度-影响交易折扣 */
-        builder.comment("Config for villager affinity").push("affinity_config");
+        /* 附加功能 交易折扣 (好感度影响) */
+        builder.comment("Config for villager trade").push("trade_adjustment");
 
-         AFFINITY_ENABLED = builder
-                .comment("Enable Emotion Analysis. If True, the transaction with villagers will be influenced by your actions.")
-                .define("affinity_enable", true);
+         TRADE_ADJUST_ENABLED = builder
+                .comment("Enable trade adjustment. If True, the transaction with villagers will be influenced by your actions.")
+                .define("trade_adjust_enabled", true);
 
-         AFFINITY_CONTEXT_LENGTH = builder
+         DISCOUNT_TURNS = builder
                 .comment("The required number of conversations triggered by discount detection")
-                .define("affinity_context_length", 8);
+                .define("discount_turns", 12);
 
          MAX_COST_ADJUST_RATIO = builder
                  .comment("Maximum price fluctuation ratio for transaction")

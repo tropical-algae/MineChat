@@ -3,29 +3,41 @@ package cn.tropicalalgae.minechat.common.model.impl;
 import cn.tropicalalgae.minechat.common.model.IEntityMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-import static cn.tropicalalgae.minechat.utils.Util.NULL_MSG_UUID;
-import static cn.tropicalalgae.minechat.utils.Util.getCurrentMinecraftTime;
+import static cn.tropicalalgae.minechat.utils.Util.*;
 
 
 public class ChatMessage implements IEntityMessage {
     private final UUID uuid;
-    private final UUID repliedUUID;
+    private final UUID repliedUUID;  // 被该信息回复的消息的UUID
     private final UUID senderUUID;
     public String senderName;
     public String content;
     public Boolean fromPlayer;
     public String time;
 
-    public ChatMessage(String senderName, UUID senderUUID, UUID repliedUUID, String content, Boolean fromPlayer) {
+    public ChatMessage(@NotNull ServerPlayer sender, String content, UUID repliedUUID) {
         this.uuid = UUID.randomUUID();
-        this.senderUUID = senderUUID;
-        this.senderName = senderName;
+        this.senderUUID = sender.getUUID();
+        this.senderName = sender.getGameProfile().getName();
         this.repliedUUID = repliedUUID;
         this.content = content;
-        this.fromPlayer = fromPlayer;
+        this.fromPlayer = true;
+        this.time = getCurrentMinecraftTime();
+    }
+
+    public ChatMessage(@NotNull Entity sender, UUID repliedUUID, String content) {
+        this.uuid = UUID.randomUUID();
+        this.senderUUID = sender.getUUID();
+        this.senderName = getEntityCustomName(sender);
+        this.repliedUUID = repliedUUID;
+        this.content = content;
+        this.fromPlayer = false;
         this.time = getCurrentMinecraftTime();
     }
 
