@@ -81,10 +81,10 @@ public class GPTEmotionAnalyst implements Runnable {
         if (canAnalyzeEmotions()) {
             // 周期执行
             int length = this.messages.size();
-            if (length % Config.AFFINITY_CONTEXT_LENGTH.get() == 0) {
+            if (length % Config.DISCOUNT_TURNS.get() == 0) {
 
                 // 取1.2 * AFFINITY_CONTEXT_LENGTH的历史会话作为输入，确保判定不会完全遗忘历史
-                int msgSize = (int) Math.ceil(Config.AFFINITY_CONTEXT_LENGTH.get() * 1.2);
+                int msgSize = (int) Math.ceil(Config.DISCOUNT_TURNS.get() * 1.2);
                 int start = Math.max(0, length - msgSize);
 
                 // 推理，存储量化结果
